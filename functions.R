@@ -72,10 +72,16 @@ reassignInPackage <-  function(name, pkgName, value, keepOld=TRUE, ...) {
   invisible(value);
 }
 
-#' THL replacemet for shiny:appMetadata
+#' THL replacement for shiny:appMetadata
 #' 
 #' This function is used to REPLACE the shiny AppMetadata function in the shiny NAMESPACE
-#' using reassignInPackage
+#' using reassignInPackage. Note that this is obviously not good practise in general, but was deemed 
+#' reasonable here since we're only replacsing a small helper function (selecting fields from a 
+#' DESCRIPTIN file and creating html nodes to display in the app in showcase mode)
+#' 
+#' @examples 
+#' reassignInPackage(name = "appMetadata", pkgName = "shiny", value = THLappMetadata)
+#' 
 THLappMetadata <- function(desc) {
   res <- ""
   try(cols <- colnames(desc))
@@ -177,13 +183,13 @@ appInfo2markdown <- function(x) {
         "* Email:", getDescriptionField(desc, "AuthorEmail"),
         "* Last updated:", getDescriptionField(desc, "Deployed"), 
         "* Git:", getDescriptionField(desc, "Git"), 
-        "## About",
+        "About",
         readme, 
         "{expand}",
         sep = "  \\")
 }
 
-#' Get description field
+#' Get a single description field from a description file by name
 getDescriptionField <- function(x, field) {
   cols <- colnames(x)
   if(field %in% colnames(x))
