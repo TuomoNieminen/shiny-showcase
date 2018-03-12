@@ -11,18 +11,38 @@
 library(shiny)
 
 source("functions.R")
-reassignInPackage(name = "appMetadata", pkgName = "shiny", value = THLappMetadata)
+source("showcase.R")
+# reassignInPackage(name = "appMetadata", pkgName = "shiny", value = THLappMetadata)
+
+
+# try to syntax highlight 
+# https://stackoverflow.com/questions/47445260/how-to-enable-syntax-highlighting-in-r-shiny-app-with-htmloutput
+prismDependencies <- tags$head(
+  tags$script(src = "https://cdnjs.cloudflare.com/ajax/libs/prism/1.8.4/prism.min.js"),
+  tags$link(rel = "stylesheet", type = "text/css",
+            href = "https://cdnjs.cloudflare.com/ajax/libs/prism/1.8.4/themes/prism.min.css")
+)
+
+prismRdependency <- tags$script(src = "https://cdnjs.cloudflare.com/ajax/libs/prism/1.8.4/components/prism-r.min.js")
+
 
 # Define UI for application that draws a histogram
 ui <- fluidPage(
+  prismDependencies,
+  prismRdependency,
    
-  wellPanel(class = "well.sm", style = "width: 100%",
+  div(wellPanel(class = "well.sm", style = "width: 100%",
             actionLink("TOGGLE_CODE", "show/hide code")
-            ),
+            )),
   
    # Application title
    titlePanel("Old Faithful Geyser Data"),
    
+  HTML("<pre><code class='language-r'>
+# this is a highlighted comment
+test <- function(x) return(x)
+       </code></pre>"),
+  
    # Sidebar with a slider input for number of bins 
    sidebarLayout(
       sidebarPanel(
@@ -36,7 +56,7 @@ ui <- fluidPage(
       # Show a plot of the generated distribution
       mainPanel(
          plotOutput("distPlot")
-      )
+         )
    )
 )
 
@@ -52,11 +72,23 @@ server <- function(input, output, session) {
       hist(x, breaks = bins, col = 'darkgray', border = 'white')
    })
    
+   x <- reactiveValues(snap = TRUE)
+   
    observeEvent(input$TOGGLE_CODE, {
-     str(session)
-     session$setShowcase(0)
-     str(session)
+     # shinyjs solution
+      # shinyjs::toggleClass(class = "invisible", selector = ".shiny-code-container")
+     
+     # custom UI
+     if(x$snap) {
+        insertUI(".container-fluid", where = "beforeEnd", ui = div(id = "showcaseInfo", showcaseAppInfo()))
+        insertUI(".container-fluid", where = "beforeEnd", ui =tags$head(tags$script("Prism.highlightAll()")))
+     }
+     else
+       removeUI("#showcaseInfo")
+     x$snap <- !x$snap
    })
+   
+   
 }
 
 # Run the application 

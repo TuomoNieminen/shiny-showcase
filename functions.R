@@ -111,12 +111,15 @@ THLappMetadata <- function(desc) {
   
   # These are THL additions
   res <- tryCatch({
-    if("Git" %in% cols) {
-      div(res, p(paste("Git:", desc[1, "Git"])))}},
-    error = {
-      warning("the thl addition to appMetadata resulted in error. Cannot parse DESCRIPTION file.")
-      return(res)})
-  res
+    with(tags, {
+      if("Git" %in% cols) {
+        div(res, p(paste("Git:", desc[1, "Git"])))
+      } else {return(res)}})
+      },
+  error = function(e){
+    warning(paste("the thl addition to appMetadata resulted in error:",e,"Cannot parse DESCRIPTION file."))
+            return(res)})
+    res
 }
 
 #' Read Shiny app info
