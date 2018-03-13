@@ -1,26 +1,57 @@
 # This is a custom shiny:showcase definition
 
+showcaseReadme <- function() {
+  readmemd <- shiny:::file.path.ci(getwd(), "Readme.md")
+  hasReadme <- file.exists(readmemd)
+  if(!hasReadme)  return(tags$p("No readme file :("))
+  includeMarkdown(readmemd)
+}
 
-# Returns tags containing the application metadata (title and author) in
-# showcase mode.
-appMetadata <- function(desc) {
-  cols <- colnames(desc)
-  if ("Title" %in% cols)
-    with(tags, h4(class="text-muted shiny-showcase-apptitle", desc[1,"Title"],
-                  if ("Author" %in% cols) small(
-                    br(), "by",
-                    if ("AuthorUrl" %in% cols)
-                      a(href=desc[1,"AuthorUrl"], class="shiny-showcase-appauthor",
-                        desc[1,"Author"])
-                    else
-                      desc[1,"Author"],
-                    if ("AuthorEmail" %in% cols)
-                      a(href=paste("mailto:", desc[1,"AuthorEmail"], sep = ''),
-                        class="shiny-showcase-appauthoreemail",
-                        desc[1,"AuthorEmail"])
-                    else "")
-                  else ""))
-  else ""
+#' THL replacement for shiny:appMetadata
+#' 
+#' 
+showcaseMetadata <- function() {
+  descfile <- shiny:::file.path.ci(getwd(), "DESCRIPTION")
+  hasDesc <- file.exists(descfile)
+  if (hasDesc) {
+    con <- textConnection(shiny:::readUTF8(descfile))
+    on.exit(close(con), add = TRUE)
+    desc <- read.dcf(con)
+  } else return("")
+  res <- ""
+  try(cols <- colnames(desc))
+  # this is the original part of appMetadata, taken from
+  # https://github.com/rstudio/shiny/blob/master/R/showcase.R
+  res <- tryCatch({
+    if ("Title" %in% cols) 
+      with(tags,
+           div(class = 'text-muted',
+               h4(class="text-muted shiny-showcase-apptitle", desc[1,"Title"]),
+           fluidRow(
+             column(6,
+                    if ("Author" %in% cols) small(
+                      "by",
+                      if ("AuthorUrl" %in% cols)
+                        a(href=desc[1,"AuthorUrl"], class="shiny-showcase-appauthor", desc[1,"Author"])
+                      else
+                        desc[1,"Author"],
+                      if ("AuthorEmail" %in% cols)
+                        p(a(href=paste("mailto:", desc[1,"AuthorEmail"], sep = ''),
+                            class="shiny-showcase-appauthoreemail",
+                            desc[1,"AuthorEmail"]))
+                    ) else ""),
+             column(6,
+                    small(
+                    if("Git" %in% cols)
+                      paste("Git:", desc[1, "Git"]),
+                    if("Deployed" %in% cols)
+                      br(), paste("Updated:", desc[1, "Deployed"])
+                    ))
+           ))) else ""}, error = function(e) {
+      warning(paste("The appMetadata func resulted in error:", e, "\nCannot parse DESCRIPTION file."))
+      return("")
+    })
+  res
 }
 
 navTabsHelper <- function(files, prefix = "") {
@@ -69,7 +100,7 @@ tabContentHelper <- function(files, path, language) {
 # Returns tags containing the application's code in Bootstrap-style tabs in
 # showcase mode.
 showcaseCodeTabs <- function(#codelicense
-  ){
+){
   rFiles <- list.files(pattern = "\\.[rR]$")
   wwwFiles <- list()
   if (isTRUE(shiny:::.globals$IncludeWWW)) {
@@ -102,12 +133,12 @@ showcaseCodeTabs <- function(#codelicense
                  )
                  #,
                  #codeLicense
-                 ))
+  ))
 }
 
 # Returns tags containing the showcase application information (readme and
 # code).
-showcaseAppInfo <- function() {
+showcaseAppCode <- function() {
   # descfile <- shiny:::file.path.ci(getwd(), "DESCRIPTION")
   # hasDesc <- file.exists(descfile)
   # readmemd <- shiny:::file.path.ci(getwd(), "Readme.md")
@@ -134,7 +165,7 @@ showcaseAppInfo <- function() {
                      #         "Code license: ",
                      #         licenseLink(desc[1,"License"]))
                      # } else ""
-                     )))))
+                   )))))
 }
 
 

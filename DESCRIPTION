@@ -3,4 +3,5 @@ Type: shiny
 Author: Tuomo Nieminen
 Git: http://gitbucket.fi
 AuthorEmail: tuomo.a.nieminen@gmail.com
-DisplayMode: Showcase
+DisplayMode: normal
+Deployed: 2018/03/14
