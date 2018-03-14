@@ -15,7 +15,7 @@ source("showcase.R")
 
 # Define UI for application that draws a histogram
 ui <- fluidPage(
-  thlUIelement(),
+  customUIelement(),
   # Application title
   titlePanel("Old Faithful Geyser Data"),
   # Sidebar with a slider input for number of bins 
@@ -37,7 +37,7 @@ server <- function(input, output, session) {
     hist(x, breaks = bins, col = 'darkgray', border = 'white')
   })
   
-  thlObserver(input)
+  customObserver(input)
   
 }
 

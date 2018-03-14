@@ -20,7 +20,7 @@ showcaseMetadata <- function() {
   } else return("")
   res <- ""
   try(cols <- colnames(desc))
-  # this is the original part of appMetadata, taken from
+  # The original source code is from appMetadata, taken from
   # https://github.com/rstudio/shiny/blob/master/R/showcase.R
   res <- tryCatch({
     if ("Title" %in% cols) 
@@ -48,7 +48,8 @@ showcaseMetadata <- function() {
                       br(), paste("Updated:", desc[1, "Deployed"])
                     ))
            ))) else ""}, error = function(e) {
-      warning(paste("The appMetadata func resulted in error:", e, "\nCannot parse DESCRIPTION file."))
+      warning(paste("The showcaseMetadata
+                    func resulted in error:", e, "\nCannot parse DESCRIPTION file."))
       return("")
     })
   res

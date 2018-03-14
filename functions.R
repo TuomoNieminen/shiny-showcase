@@ -1,4 +1,4 @@
-thlUIelement <- function() {
+customUIelement <- function() {
   # try to syntax highlight 
   # https://stackoverflow.com/questions/47445260/how-to-enable-syntax-highlighting-in-r-shiny-app-with-htmloutput
   prismDependencies <- tags$head(
@@ -9,14 +9,18 @@ thlUIelement <- function() {
   
   tagList(prismDependencies,
           prismRdependency,
-          div(wellPanel(class = "well.sm", style = "width: 100%",
-                        actionLink("TOGGLE_CODE", "show/hide code"),
-                        actionLink("SHOW_README", "View Readme")
-          )))
+          wellPanel(class = "well.sm", style = "width: 100%",
+                    fluidRow(
+                      column(6,
+                             actionLink("TOGGLE_CODE", "show/hide code")),
+                      column(6,
+                              actionLink("SHOW_README", "View Readme"))
+                    )
+          ))
 }
 
 
-thlObserver <- function(input) {
+customObserver <- function(input) {
   observe({
     code <- reactiveValues(not_rendered = TRUE)
     
@@ -36,7 +40,7 @@ thlObserver <- function(input) {
     
     observeEvent(input$SHOW_README, {
       showModal(modalDialog(
-        title = "Readme",
+        title = NULL,
         showcaseMetadata(),
         hr(),
         showcaseReadme(),
